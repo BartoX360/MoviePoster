@@ -1,0 +1,63 @@
+---
+name: MoviePoster
+strategy: polling
+polling_verb: get
+# une requête par semaine de sortie (mercredi → mardi) : la précédente, celle en cours et les quatre suivantes
+polling_url: |-
+  {%- assign now = 'now' | date: '%s' | plus: 0 -%}
+  {%- assign wed = 'now' | date: '%w' | plus: 4 | modulo: 7 | times: -86400 | plus: now -%}
+  {%- for k in (0..5) -%}
+  {%- assign a = k | minus: 1 | times: 604800 | plus: wed -%}{%- assign b = a | plus: 518400 -%}
+  https://api.themoviedb.org/3/discover/movie?api_key={{ api_key | strip }}&region={{ region | default: 'FR' }}&language={% if language == 'fr' %}fr-FR{% else %}en-US{% endif %}&with_release_type=3&release_date.gte={{ a | date: '%Y-%m-%d' }}&release_date.lte={{ b | date: '%Y-%m-%d' }}&sort_by=popularity.desc&include_adult=false
+  {% endfor -%}
+polling_headers: ''
+refresh_interval: 60
+no_screen_padding: 'yes'
+dark_mode: 'no'
+static_data: ''
+custom_fields:
+- keyname: about
+  field_type: author_bio
+  name: MoviePoster
+  description: "What's out at the movies and what's coming next, drawn as a poster. Data and posters: TMDB. This product uses the TMDB API but is not endorsed or certified by TMDB. / Les films à l'affiche et les prochaines sorties au cinéma, façon affiche."
+- keyname: api_key
+  field_type: string
+  name: TMDB API key / Clé d'API TMDB
+  description: The free "API key" (v3) from themoviedb.org → Settings → API. / La « clé d'API » (v3) gratuite de themoviedb.org → Paramètres → API.
+- keyname: region
+  field_type: select
+  name: Country / Pays
+  description: Release dates in theaters in this country.
+  options:
+  - France: FR
+  - Belgique / Belgium: BE
+  - Suisse / Switzerland: CH
+  - Canada: CA
+  - United Kingdom: GB
+  - United States: US
+  default: FR
+- keyname: featured
+  field_type: select
+  name: Poster / Affiche
+  description: Which movie gets the poster. Rotate changes every hour between the most anticipated movies, the ones now showing and the next releases.
+  options:
+  - Rotate / Rotation: rotate
+  - Most anticipated / Les plus attendus: hot
+  - Now showing / À l'affiche: now
+  - Coming soon / Prochainement: upcoming
+  default: rotate
+- keyname: language
+  field_type: select
+  name: Language / Langue
+  options:
+  - English: en
+  - Français: fr
+  default: en
+- keyname: style
+  field_type: select
+  name: Style
+  description: E-ink for black & white screens (TRMNL), Color for LCD screens.
+  options:
+  - E-ink: eink
+  - Color / Couleur: color
+  default: eink

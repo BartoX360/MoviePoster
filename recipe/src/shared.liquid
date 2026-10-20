@@ -1,0 +1,375 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@800;900&family=IBM+Plex+Mono:wght@400;500;600&display=block" rel="stylesheet">
+<style>
+  .view:has(> .mp) { position: relative; padding: 0; overflow: hidden; }
+  .mp { position: absolute; inset: 0; overflow: hidden; container-type: size;
+        --bg: #f2eee6; --ink: #111111; --muted: #444455; --sky: #ccddee; --ray: #dde8f3; --top: #444455;
+        --accent: #dd2233; --on-accent: #ffffff; --reel-fill: #ffffff;
+        --sky-h: 64%; --pad: 4.4cqw; --f-top: max(11px, 1.35cqw); --f-meta: max(12px, 1.45cqw);
+        --f-title: 6.2cqw; --f-sub: max(12px, 1.5cqw); --stamp: min(10.5cqw, 17cqh); --shadow: max(6px, .8cqw);
+        background: var(--bg); color: var(--ink); font-family: 'IBM Plex Mono', ui-monospace, monospace; }
+  /* une couleur de ciel par rubrique : soleil, ciel clair, crépuscule */
+  .mp--sec-hot { --sky: #ffcc44; --ray: #ffcc88; --top: #442233; }
+  .mp--sec-now { --sky: #ccddee; --ray: #e6e9ee; --top: #444455; }
+  .mp--sec-upcoming { --sky: #ee9977; --ray: #ffbf80; --top: #442233; }
+  .mp.mp--eink { --bg: #ffffff; --ink: #000000; --muted: #000000; --sky: #ffffff; --ray: url(#mp-dots); --top: #000000;
+                 --accent: #000000; --on-accent: #ffffff; }
+
+  .mp-sky { position: absolute; left: 0; right: 0; top: 0; height: var(--sky-h); background: var(--sky); overflow: hidden; }
+  .mp-rays { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .mp-art { position: absolute; left: 8%; right: 8%; top: 17%; bottom: 10%; display: flex; align-items: center; justify-content: center; }
+  .mp-frame { position: relative; flex: 0 0 auto; border: max(3px, .3cqw) solid var(--ink); background: var(--ink);
+              box-shadow: var(--shadow) var(--shadow) 0 var(--ink); visibility: hidden; }
+  .mp-frame img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .mp--eink .mp-frame img { filter: grayscale(1) contrast(1.15); }
+  .mp--img .mp-frame { visibility: visible; }
+  .mp-reel { display: none; width: 72%; height: 92%; }
+  .mp--noimg .mp-frame { display: none; }
+  .mp--noimg .mp-reel { display: block; }
+  .mp-tag { position: absolute; left: calc(-1 * var(--shadow)); top: calc(-1.4 * var(--shadow)); padding: .25em .6em;
+            background: var(--ink); color: var(--bg); font-size: var(--f-top); letter-spacing: .2em; text-transform: uppercase;
+            white-space: nowrap; }
+  .mp-tag:empty { display: none; }
+  .mp-top { position: absolute; top: calc(var(--pad) * .6); left: var(--pad); right: var(--pad); display: flex;
+            justify-content: space-between; gap: 2em; font-size: var(--f-top); letter-spacing: .28em;
+            text-transform: uppercase; color: var(--top); white-space: nowrap; }
+  .mp-top > span:first-child { overflow: hidden; text-overflow: ellipsis; }
+  /* les libellés restent lisibles par-dessus les rayons */
+  .mp-top > span { background: var(--sky); padding: .25em .5em; margin: -.25em -.5em; }
+  .mp-upd-short { display: none; }
+  .mp--half_horizontal .mp-upd-long, .mp--half_vertical .mp-upd-long, .mp--quadrant .mp-upd-long { display: none; }
+  .mp--half_horizontal .mp-upd-short, .mp--half_vertical .mp-upd-short, .mp--quadrant .mp-upd-short { display: inline; }
+
+  .mp-info { position: absolute; left: var(--pad); right: var(--pad); top: var(--sky-h); bottom: 0;
+             border-top: max(2px, .25cqw) solid var(--ink); display: flex; align-items: center; gap: 3cqw; }
+  .mp-text { flex: 1 1 auto; min-width: 0; }
+  .mp-meta { font-size: var(--f-meta); letter-spacing: .2em; text-transform: uppercase; color: var(--muted);
+             white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mp-title { font-family: 'Archivo', 'Arial Black', sans-serif; font-weight: 900; font-size: var(--f-title);
+              line-height: 1.05; text-transform: uppercase; margin: .18em 0 .14em; white-space: nowrap; overflow: hidden; }
+  .mp-title.wrap { white-space: normal; line-height: 1.02; overflow-wrap: anywhere; }
+  .mp-sub { font-size: var(--f-sub); color: var(--muted); letter-spacing: .03em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mp-sub b { color: var(--ink); font-weight: 500; }
+  .mp-next { margin-top: .45em; }
+  .mp-stamp { flex: 0 0 auto; text-align: center; font-size: var(--f-top); letter-spacing: .2em; color: var(--muted);
+              text-transform: uppercase; white-space: nowrap; }
+  .mp-ring { display: flex; align-items: center; justify-content: center; width: var(--stamp); height: var(--stamp);
+             margin: .45em auto; border-radius: 50%; background: var(--accent); color: var(--on-accent);
+             transform: rotate(-8deg); font-family: 'Archivo', 'Arial Black', sans-serif; font-weight: 900;
+             font-size: calc(var(--stamp) * .44); letter-spacing: -.02em; line-height: 1; }
+  .mp-ring.long { font-size: calc(var(--stamp) * .3); }
+  .mp-ring.word { font-size: calc(var(--stamp) * .2); letter-spacing: .02em; text-transform: uppercase; }
+  .mp-ring.none { background: transparent; color: var(--ink); border: max(3px, .3cqw) solid var(--ink); }
+  .mp-err .mp-meta { color: var(--accent); }
+  .mp--error .mp-stamp, .mp--error .mp-next, .mp--error .mp-tag { display: none; }
+  /* e-ink 1 bit : pas d'anticrénelage, il faut des traits plus épais */
+  .mp--eink { font-weight: 600; --f-top: max(13px, 1.35cqw); --f-meta: max(13px, 1.45cqw); --f-sub: max(13px, 1.5cqw); }
+  .mp--eink .mp-sub b { font-weight: 600; }
+  .mp--eink .mp-top, .mp--eink .mp-meta { letter-spacing: .14em; }
+
+  .mp--half_horizontal { --pad: 3cqw; --f-title: 4.6cqw; --stamp: 30cqh; }
+  .mp--half_horizontal .mp-sky { right: auto; width: 34%; height: 100%; border-right: max(2px, .25cqw) solid var(--ink); }
+  .mp--half_horizontal .mp-art { left: 9%; right: 11%; top: 22%; bottom: 13%; }
+  .mp--half_horizontal .mp-info { left: calc(34% + var(--pad)); top: 0; border-top: 0; }
+  .mp--half_horizontal .mp-top > span:first-child, .mp--half_vertical .mp-top > span:first-child,
+  .mp--quadrant .mp-top > span:first-child { display: none; }
+  .mp--half_horizontal .mp-top, .mp--half_vertical .mp-top, .mp--quadrant .mp-top { justify-content: flex-end; letter-spacing: .1em; }
+  .mp--half_horizontal .mp-next, .mp--quadrant .mp-next { display: none; }
+  .mp--half_vertical { --sky-h: 42%; --pad: 5cqw; --f-top: max(11px, 2.6cqw); --f-meta: max(11px, 2.9cqw);
+                       --f-title: 9cqw; --f-sub: max(12px, 3.2cqw); --stamp: 19cqw; }
+  .mp--half_vertical .mp-art { left: 6%; right: 8%; top: 17%; bottom: 12%; }
+  .mp--half_vertical .mp-meta, .mp--half_vertical .mp-sub { white-space: normal; line-height: 1.5; }
+  .mp--half_vertical .mp-info { align-items: flex-start; padding-top: 7cqw; }
+  .mp--quadrant { --sky-h: 46%; --pad: 4.5cqw; --f-top: max(11px, 2.8cqw); --f-meta: max(11px, 2.8cqw);
+                  --f-title: 7.5cqw; --f-sub: max(11px, 2.8cqw); --stamp: 15cqw; }
+  .mp--quadrant .mp-art { left: 4%; right: 6%; top: 17%; bottom: 9%; }
+  /* petits formats : le tampon chevauche le bas de l'affiche */
+  .mp--half_vertical .mp-stamp, .mp--quadrant .mp-stamp { position: absolute; right: 0; top: calc(var(--stamp) * -.62); }
+  .mp--half_vertical .mp-stamp > span, .mp--quadrant .mp-stamp > span { display: none; }
+  .mp--half_vertical .mp-text, .mp--quadrant .mp-text { padding-right: calc(var(--stamp) * .55); }
+  .mp--half_vertical .mp-meta, .mp--quadrant .mp-meta { margin-right: calc(var(--stamp) * .5); }
+</style>
+
+{% template movieposter %}
+<div class="mp mp--{{ size }}{% if cf.style == 'color' %} mp--color{% else %} mp--eink{% endif %}"
+     data-lang="{{ cf.language | default: 'en' }}" data-featured="{{ cf.featured | default: 'rotate' }}"
+     data-key="{% if cf.api_key != blank %}1{% endif %}" data-ts="{{ ts }}" data-off="{{ off | default: 0 }}">
+  <!-- une liste TMDB par semaine de sortie (mercredi → mardi) : la précédente, la semaine en cours, les quatre suivantes -->
+  <script type="application/json" class="mp-weeks">[{{ w0 | json }},{{ w1 | json }},{{ w2 | json }},{{ w3 | json }},{{ w4 | json }},{{ w5 | json }}]</script>
+  <div class="mp-sky">
+    <svg class="mp-rays" viewBox="0 0 1280 540" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="mp-dots" width="16" height="16" patternUnits="userSpaceOnUse">
+          <rect width="16" height="16" fill="#fff"/>
+          <circle cx="4" cy="4" r="1.6" fill="#000"/><circle cx="12" cy="12" r="1.6" fill="#000"/>
+        </pattern>
+      </defs>
+      <g class="mp-rays-g" style="fill:var(--ray)"></g>
+    </svg>
+    <!-- l'affiche du film, cernée de noir comme la jaquette de GamePoster ; un clap si elle manque -->
+    <div class="mp-art">
+      <div class="mp-frame"><img class="mp-cover" alt=""><span class="mp-tag"></span></div>
+      <svg class="mp-reel" viewBox="-20 -10 460 340" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+        <g transform="rotate(-12 40 110)">
+          <path d="M30 70 H400 V122 H30 Z" style="fill:var(--reel-fill);stroke:var(--ink)" stroke-width="10" stroke-linejoin="round"/>
+          <path d="M70 75 L110 75 L85 117 L45 117 Z M160 75 L200 75 L175 117 L135 117 Z M250 75 L290 75 L265 117 L225 117 Z M340 75 L380 75 L355 117 L315 117 Z" style="fill:var(--ink)"/>
+        </g>
+        <path d="M30 130 H400 V310 H30 Z" style="fill:var(--reel-fill);stroke:var(--ink)" stroke-width="10" stroke-linejoin="round"/>
+        <path d="M30 130 H400 V180 H30 Z" style="fill:var(--ink)"/>
+        <path d="M75 133 L115 133 L90 177 L50 177 Z M165 133 L205 133 L180 177 L140 177 Z M255 133 L295 133 L270 177 L230 177 Z M345 133 L385 133 L360 177 L320 177 Z" style="fill:var(--reel-fill)"/>
+        <circle cx="215" cy="245" r="38" style="fill:var(--accent)"/>
+        <path d="M203 225 L238 245 L203 265 Z" style="fill:var(--on-accent)"/>
+      </svg>
+    </div>
+    <div class="mp-top">
+      <span class="mp-k"></span>
+      <span class="mp-upd"><span class="mp-upd-long"></span><span class="mp-upd-short"></span><span class="mp-time">--:--</span></span>
+    </div>
+  </div>
+  <div class="mp-info">
+    <div class="mp-text">
+      <div class="mp-meta"></div>
+      <div class="mp-title"></div>
+      <div class="mp-sub mp-genres"></div>
+      <div class="mp-sub mp-next"></div>
+    </div>
+    <div class="mp-stamp">
+      <span class="mp-stamp-k"></span>
+      <div class="mp-ring"></div>
+      <span class="mp-stamp-l"></span>
+    </div>
+  </div>
+</div>
+{% endtemplate %}
+
+<script>
+(function () {
+  var IMG = 'https://image.tmdb.org/t/p/w780';
+  var GENRES = {
+    fr: { 28: 'Action', 12: 'Aventure', 16: 'Animation', 35: 'Comédie', 80: 'Policier', 99: 'Documentaire', 18: 'Drame',
+          10751: 'Familial', 14: 'Fantastique', 36: 'Histoire', 27: 'Horreur', 10402: 'Musique', 9648: 'Mystère',
+          10749: 'Romance', 878: 'Science-fiction', 10770: 'Téléfilm', 53: 'Thriller', 10752: 'Guerre', 37: 'Western' },
+    en: { 28: 'Action', 12: 'Adventure', 16: 'Animation', 35: 'Comedy', 80: 'Crime', 99: 'Documentary', 18: 'Drama',
+          10751: 'Family', 14: 'Fantasy', 36: 'History', 27: 'Horror', 10402: 'Music', 9648: 'Mystery',
+          10749: 'Romance', 878: 'Science fiction', 10770: 'TV movie', 53: 'Thriller', 10752: 'War', 37: 'Western' }
+  };
+  var I18N = {
+    fr: {
+      hot: 'Les plus attendus', now: 'À l\'affiche', upcoming: 'Prochainement',
+      updated: 'Dernière actualisation à ', upd: 'Màj ',
+      days: ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'],
+      months: ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'],
+      mshort: ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'],
+      date: function (d, m, n) { return d + ' ' + (n === 1 ? '1er' : n) + ' ' + m; },
+      dshort: function (m, n) { return n + ' ' + m; },
+      rank: function (n) { return 'Nº ' + n + ' des plus attendus'; },
+      since: function (n) { return n === 0 ? 'Sort aujourd\'hui' : n === 1 ? 'En salle depuis hier' : 'En salle depuis ' + n + ' jours'; },
+      out: function (n) { return n === 0 ? 'Sort aujourd\'hui' : n === 1 ? 'Sort demain' : 'Sort dans ' + n + ' jours'; },
+      orig: 'VO : ', then: 'Ensuite : ', also: 'Aussi : ', tagNew: 'Nouveau',
+      score: 'Note', critic: 'TMDB', unrated: 'Pas encore noté', outIn: 'Sortie', day: 'jour', daysW: 'jours', today: 'Auj.',
+      offlineMeta: 'Sorties indisponibles', offline: 'Hors ligne', noFeed: 'Impossible de joindre TMDB pour le moment.',
+      keyMeta: 'Clé d\'API manquante', key: 'Clé TMDB', keyTxt: 'Ajoutez votre clé d\'API TMDB dans les réglages du plugin.',
+      emptyMeta: 'Rien à afficher', empty: 'Aucun film', emptyTxt: 'Aucune sortie trouvée pour ce pays.'
+    },
+    en: {
+      hot: 'Most anticipated', now: 'Now showing', upcoming: 'Coming soon',
+      updated: 'Last updated at ', upd: 'Upd. ',
+      days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+      months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+      mshort: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+      date: function (d, m, n) { return d + ', ' + m + ' ' + n; },
+      dshort: function (m, n) { return m + ' ' + n; },
+      rank: function (n) { return 'No. ' + n + ' most anticipated'; },
+      since: function (n) { return n === 0 ? 'Out today' : n === 1 ? 'In theaters since yesterday' : 'In theaters for ' + n + ' days'; },
+      out: function (n) { return n === 0 ? 'Out today' : n === 1 ? 'Out tomorrow' : 'Out in ' + n + ' days'; },
+      orig: 'Original title: ', then: 'Next: ', also: 'Also: ', tagNew: 'New',
+      score: 'Score', critic: 'TMDB', unrated: 'Not rated yet', outIn: 'Out in', day: 'day', daysW: 'days', today: 'Today',
+      offlineMeta: 'Releases unavailable', offline: 'Offline', noFeed: 'Unable to reach TMDB right now.',
+      keyMeta: 'API key missing', key: 'TMDB key', keyTxt: 'Add your TMDB API key in the plugin settings.',
+      emptyMeta: 'Nothing to show', empty: 'No movies', emptyTxt: 'No release found for this country.'
+    }
+  };
+
+  function json(el) { try { return JSON.parse(el.textContent); } catch (e) { return null; } }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  // Archivo n'a que l'alphabet latin : un titre qui n'en contient pas ne peut pas être affiché
+  function latin(s) { return /[A-Za-zÀ-ɏ]/.test(s || ''); }
+  // Titre : d'abord réduit sur une ligne, puis sur deux lignes s'il est encore trop long
+  function fit(el) {
+    el.style.fontSize = ''; el.classList.remove('wrap');
+    var base = parseFloat(getComputedStyle(el).fontSize), size = base;
+    var shrink = function () { size *= 0.94; el.style.fontSize = size + 'px'; };
+    while (el.scrollWidth > el.clientWidth + 1 && size > base * 0.7) shrink();
+    if (el.scrollWidth <= el.clientWidth + 1) return;
+    el.classList.add('wrap');
+    while ((el.scrollHeight > size * 2.1 + 2 || el.scrollWidth > el.clientWidth + 1) && size > base * 0.3) shrink();
+  }
+
+  // Les films de chaque semaine, datés de leur sortie dans le pays choisi.
+  // TMDB filtre bien sur la date locale mais renvoie parfois la date de première sortie mondiale :
+  // dans ce cas, le film sort le premier jour de la semaine, le mercredi.
+  function films(weeks) {
+    var day = function (s) { return s ? Math.floor(Date.parse(s.substr(0, 10) + 'T00:00:00Z') / 864e5) : null; };
+    var seen = {}, all = [];
+    weeks.forEach(function (w) {
+      var list = (w && w.results) || [], count = {}, mode = null;
+      list.forEach(function (m) { var d = day(m.release_date); if (d != null && (count[d] = (count[d] || 0) + 1) > (count[mode] || 0)) mode = d; });
+      if (mode == null) return;
+      var wed = mode - (mode + 1) % 7; // le 1er janvier 1970 était un jeudi
+      list.forEach(function (m) {
+        var d = day(m.release_date), title = latin(m.title) ? m.title : m.original_title;
+        // rééditions de vieux films et titres illisibles écartés, chaque film n'est compté qu'une fois
+        if (seen[m.id] || !latin(title) || d == null || d < wed - 400) return;
+        seen[m.id] = 1;
+        all.push({ title: title, orig: m.original_title, poster: m.poster_path, backdrop: m.backdrop_path, genres: m.genre_ids || [],
+                   day: d >= wed && d < wed + 7 ? d : wed, pop: m.popularity || 0, vote: m.vote_average || 0, votes: m.vote_count || 0 });
+      });
+    });
+    return all;
+  }
+
+  function render(root) {
+    root.setAttribute('data-done', '1');
+    var q = function (s) { return root.querySelector(s); };
+    var lang = root.dataset.lang === 'fr' ? 'fr' : 'en', t = I18N[lang];
+    var ts = parseInt(root.dataset.ts, 10) || Math.floor(Date.now() / 1000), off = parseInt(root.dataset.off, 10) || 0;
+    var weeks = json(q('.mp-weeks')) || [];
+    var all = films(weeks);
+
+    q('.mp-upd-long').textContent = t.updated;
+    q('.mp-upd-short').textContent = t.upd;
+    q('.mp-time').textContent = new Date((ts + off) * 1000).toISOString().substr(11, 5);
+
+    // Jours entiers entre aujourd'hui (heure locale) et la sortie
+    var today = Math.floor((ts + off) / 86400);
+    var when = function (f, long) {
+      var dt = new Date(f.day * 864e5);
+      return long ? t.date(t.days[dt.getUTCDay()], t.months[dt.getUTCMonth()], dt.getUTCDate())
+                  : t.dshort(t.mshort[dt.getUTCMonth()], dt.getUTCDate());
+    };
+    var byPop = function (a, b) { return b.pop - a.pop; };
+    var coming = all.filter(function (f) { return f.day > today; });
+    var lists = {
+      // les films les plus suivis parmi ceux qui sortent dans les semaines à venir
+      hot: coming.slice().sort(byPop),
+      // sortis ces deux dernières semaines, les plus suivis d'abord
+      now: all.filter(function (f) { return f.day <= today && f.day > today - 14; }).sort(byPop),
+      // la prochaine sortie, puis les suivantes ; le plus suivi d'abord pour un même jour
+      upcoming: coming.slice().sort(function (a, b) { return a.day - b.day || b.pop - a.pop; })
+    };
+
+    // Rubrique et film à l'affiche : fixés par le réglage, ou une rotation horaire parmi les trois premiers de chaque rubrique
+    var secs = ['hot', 'now', 'upcoming'].filter(function (s) { return lists[s].length; });
+    var sec = root.dataset.featured, idx = 0, slot = Math.floor(ts / 3600);
+    if (!lists[sec] || !lists[sec].length) {
+      sec = secs[slot % (secs.length || 1)];
+      if (sec) idx = Math.floor(slot / secs.length) % Math.min(3, lists[sec].length);
+    }
+    root.classList.add('mp--sec-' + (sec || 'hot'));
+    rays(root);
+    q('.mp-k').textContent = t[sec || 'hot'];
+
+    if (!sec) {
+      var nokey = !root.dataset.key, down = !weeks.some(function (w) { return w && w.results; });
+      root.classList.add('mp--error', 'mp--noimg');
+      q('.mp-k').textContent = 'MoviePoster';
+      q('.mp-meta').textContent = nokey ? t.keyMeta : down ? t.offlineMeta : t.emptyMeta;
+      q('.mp-title').textContent = nokey ? t.key : down ? t.offline : t.empty;
+      q('.mp-genres').textContent = nokey ? t.keyTxt : down ? t.noFeed : t.emptyTxt;
+      q('.mp-info').classList.add('mp-err');
+      return fit(q('.mp-title'));
+    }
+
+    var list = lists[sec], f = list[idx], left = f.day - today;
+    // l'affiche en priorité, une photo du film à défaut
+    cover(root, f.poster ? IMG + f.poster : f.backdrop ? IMG + f.backdrop : null);
+    q('.mp-title').textContent = f.title || '—';
+
+    var meta;
+    if (sec === 'hot') {
+      meta = t.rank(idx + 1) + ' · ' + when(f, true);
+      q('.mp-tag').textContent = 'Nº ' + (idx + 1);
+    } else if (sec === 'now') {
+      meta = t.since(Math.max(0, -left)) + ' · ' + when(f, true);
+      if (-left < 7) q('.mp-tag').textContent = t.tagNew;
+    } else meta = t.out(Math.max(0, left)) + ' · ' + when(f, true);
+    q('.mp-meta').textContent = meta;
+
+    var genres = f.genres.map(function (g) { return GENRES[lang][g]; }).filter(Boolean).slice(0, 3);
+    var sub = genres.map(function (g) { return '<b>' + g + '</b>'; }).join(' · ');
+    if (f.orig && f.orig !== f.title && latin(f.orig)) sub += (sub ? ' · ' : '') + t.orig + esc(f.orig);
+    q('.mp-genres').innerHTML = sub;
+
+    var others = [];
+    list.forEach(function (o, i) {
+      if (i === idx || others.length >= 4) return;
+      var name = esc(o.title || '—');
+      if (sec === 'hot') others.push((i + 1) + '. ' + name + ' <b>' + when(o, false) + '</b>');
+      else if (sec === 'now') others.push(name + (o.votes >= 10 ? ' <b>' + score(o, lang) + '</b>' : ''));
+      else others.push(name + ' <b>' + when(o, false) + '</b>');
+    });
+    q('.mp-next').innerHTML = others.length ? (sec === 'now' || idx ? t.also : t.then) + others.join(' · ') : '';
+
+    // Tampon : la note TMDB d'un film en salle, ou le compte à rebours avant la sortie
+    var ring = q('.mp-ring');
+    if (sec !== 'now') {
+      var n = Math.max(0, left);
+      q('.mp-stamp-k').textContent = t.outIn;
+      ring.textContent = n === 0 ? t.today : n;
+      if (n === 0) ring.classList.add('word'); else if (n > 99) ring.classList.add('long');
+      q('.mp-stamp-l').textContent = n === 0 ? '' : n === 1 ? t.day : t.daysW;
+    } else if (f.votes < 10) {
+      q('.mp-stamp-k').textContent = t.score;
+      ring.textContent = '—'; ring.classList.add('none');
+      q('.mp-stamp-l').textContent = t.unrated;
+    } else {
+      q('.mp-stamp-k').textContent = t.score;
+      ring.textContent = score(f, lang);
+      ring.classList.add('long');
+      q('.mp-stamp-l').textContent = t.critic;
+    }
+    fit(q('.mp-title'));
+  }
+
+  // Note sur 10 avec une décimale : 6,9 en français, 6.9 en anglais
+  function score(f, lang) {
+    var s = (Math.round(f.vote * 10) / 10).toFixed(1);
+    return lang === 'fr' ? s.replace('.', ',') : s;
+  }
+
+  // Affiche cadrée à son format d'origine dans la zone du ciel
+  function cover(root, url) {
+    var img = root.querySelector('.mp-cover'), frame = root.querySelector('.mp-frame'), art = root.querySelector('.mp-art');
+    if (!url) return root.classList.add('mp--noimg');
+    var place = function () {
+      var w = img.naturalWidth, h = img.naturalHeight;
+      if (!w || !h) return root.classList.add('mp--noimg');
+      var k = Math.min(art.clientWidth / w, art.clientHeight / h);
+      frame.style.width = Math.round(w * k) + 'px'; frame.style.height = Math.round(h * k) + 'px';
+      root.classList.add('mp--img');
+    };
+    img.onload = place;
+    img.onerror = function () { root.classList.add('mp--noimg'); };
+    img.src = url;
+    if (img.complete && img.naturalWidth) place();
+  }
+
+  // Rayons de soleil derrière l'affiche
+  function rays(root) {
+    var NS = 'http://www.w3.org/2000/svg', g = root.querySelector('.mp-rays-g'), cx = 640, cy = 300, n = 18, r = 1600;
+    for (var i = 0; i < n; i++) {
+      var a0 = (i * 2) * Math.PI / n, a1 = (i * 2 + 1) * Math.PI / n;
+      var p = document.createElementNS(NS, 'path');
+      p.setAttribute('d', 'M' + cx + ' ' + cy + ' L' + (cx + r * Math.cos(a0)) + ' ' + (cy + r * Math.sin(a0))
+        + ' L' + (cx + r * Math.cos(a1)) + ' ' + (cy + r * Math.sin(a1)) + ' Z');
+      g.appendChild(p);
+    }
+  }
+
+  function boot() { document.querySelectorAll('.mp:not([data-done])').forEach(render); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () {
+    document.querySelectorAll('.mp-title').forEach(fit);
+  });
+})();
+</script>
