@@ -20,7 +20,6 @@ $down = array_fill_keys(['IDX_0', 'IDX_1', 'IDX_2', 'IDX_3', 'IDX_4', 'IDX_5'], 
 $empty = array_fill_keys(array_keys($down), ['page' => 1, 'results' => [], 'total_results' => 0]);
 // heure UTC du 20/10 dont le créneau horaire vaut $k modulo 9 (rotation : rubrique = k % 3, rang = k / 3)
 $slot = fn($k) => (int) collect(range(0, 23))->first(fn($h) => intdiv(Carbon::create(2026, 10, 20, $h, 0, 0, 'UTC')->timestamp, 3600) % 9 == $k);
-// les formats réduits ne sont rendus qu'en e-ink : le mashup de l'écran couleur sort blanc dans LaraPaper (comme pour les autres Poster)
 $cases = [
   // nom, taille, modèle, style, langue, affiche, données, heure (UTC), clé
   ['fr_color_hot', 'full', 55, 'color', 'fr', 'hot', $feeds['fr'], 10],

@@ -82,7 +82,6 @@ The polling URL makes six TMDB requests, one per release week (Wednesday to Tues
 - The screen is built with JavaScript at render time, so the renderer must run JavaScript.
 - Posters are loaded from TMDB at render time; on e-ink they are turned to grayscale and dithered by the renderer.
 - Titles without Latin letters (the title font has none) fall back to the original title, or the movie is skipped.
-- In LaraPaper, the half and quadrant layouts render blank on the color (Echo Show) screen model, for every Poster plugin: they are tested on e-ink only.
 - A refresh interval of 60 minutes keeps the rotation going; TMDB's limits are far above six requests an hour.
 - This product uses the TMDB API but is not endorsed or certified by TMDB.
 
@@ -150,6 +149,5 @@ L'URL de polling fait six requêtes TMDB, une par semaine de sortie (du mercredi
 - L'écran est construit en JavaScript au moment du rendu : le moteur de rendu doit exécuter le JavaScript.
 - Les affiches sont chargées depuis TMDB au moment du rendu ; en e-ink, elles passent en niveaux de gris, tramés par le moteur de rendu.
 - Un titre sans lettres latines (absentes de la police des titres) est remplacé par le titre original, ou le film est écarté.
-- Dans LaraPaper, les formats demi et quart d'écran sortent blancs sur le modèle d'écran couleur (Echo Show), pour tous les plugins Poster : ils ne sont testés qu'en e-ink.
 - Un rafraîchissement toutes les 60 minutes suffit à faire tourner l'affiche ; les limites de TMDB sont bien au-delà de six requêtes par heure.
 - Ce produit utilise l'API TMDB mais n'est ni approuvé ni certifié par TMDB.

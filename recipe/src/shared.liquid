@@ -2,6 +2,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@800;900&family=IBM+Plex+Mono:wght@400;500;600&display=block" rel="stylesheet">
 <style>
   .view:has(> .mp) { position: relative; padding: 0; overflow: hidden; }
+  /* mashups des écrans gris et couleur : le framework y met les vues à z-index -2, ce qui une fois
+     la vue positionnée la ferait passer sous le fond de l'écran (rendu tout blanc) */
+  .trmnl .screen .mashup .view:has(> .mp) { z-index: 0; }
   .mp { position: absolute; inset: 0; overflow: hidden; container-type: size;
         --bg: #f2eee6; --ink: #111111; --muted: #444455; --sky: #ccddee; --ray: #dde8f3; --top: #444455;
         --accent: #dd2233; --on-accent: #ffffff; --reel-fill: #ffffff;
