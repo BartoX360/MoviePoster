@@ -1,4 +1,7 @@
 .DS_Store
 # Rendus de test et capture de l'écran réel
 previews/
-recipe/movieposter.zip
+# Recette zippée, publiée dans les releases
+recipe/*.zip
+# Réglages locaux des scripts de développement
+dev/.env

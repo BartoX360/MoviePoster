@@ -10,7 +10,7 @@
 
 *What's on at the movies, drawn as a poster.*
 
-A TRMNL plugin that puts one movie on a poster: the most anticipated upcoming movies, the ones now showing or the next releases, with its poster, its TMDB score or a countdown to its release. It is part of the Poster suite with [FlightPoster](http://192.168.1.109:3000/Anthony/FlightPoster), [WeatherPoster](http://192.168.1.109:3000/Anthony/WeatherPoster) and [GamePoster](http://192.168.1.109:3000/Anthony/GamePoster), and shares their look.
+A TRMNL plugin that puts one movie on a poster: the most anticipated upcoming movies, the ones now showing or the next releases, with its poster, its TMDB score or a countdown to its release. It is part of the Poster suite with [FlightPoster](https://github.com/BartoX360/FlightPoster), [WeatherPoster](https://github.com/BartoX360/WeatherPoster), [GamePoster](https://github.com/BartoX360/GamePoster), [ShowPoster](https://github.com/BartoX360/ShowPoster) and [BookPoster](https://github.com/BartoX360/BookPoster)and shares their look.
 
 No server to install: the data and posters come from [TMDB](https://www.themoviedb.org), with your own free API key.
 
@@ -47,7 +47,7 @@ First get a TMDB API key: create a free account on [themoviedb.org](https://www.
 
 The `recipe/src/` folder follows the [trmnlp](https://github.com/usetrmnl/trmnlp) layout.
 
-**LaraPaper / BYOS**: *Plugins → Import recipe*, pick `recipe/movieposter.zip` (built by `recipe_render.sh`, or zip the contents of `recipe/src/`), then fill in your settings.
+**LaraPaper / BYOS**: *Plugins → Import recipe*, pick `movieposter-x.y.z.zip` from the [latest release](https://github.com/BartoX360/MoviePoster/releases/latest) (or zip the contents of `recipe/src/`), then fill in your settings.
 
 ### Settings
 
@@ -71,11 +71,13 @@ The polling URL makes six TMDB requests, one per release week (Wednesday to Tues
 
 | File | Purpose |
 |---|---|
-| `recipe_render.sh <folder>` | Zips the recipe, imports it into LaraPaper as "MoviePoster (test)", renders every test case and copies the PNGs into `<folder>`; with `TMDB_KEY` set, also checks the live feed |
-| `recipe_test.php` | The test cases (section, rotation, layout, device, language, missing poster, errors, missing key) run inside LaraPaper |
-| `test_payload.json` | Frozen TMDB results for France (October 20, 2026), in French and English, used by the test cases |
-| `update.php` | Copies the code of "MoviePoster (test)" into the installed plugin, keeping its settings |
-| `install.php` | First install: imports the recipe as "MoviePoster" with the key from `TMDB_KEY` |
+| `dev/recipe_render.sh <folder>` | Zips the recipe, imports it into LaraPaper as "MoviePoster (test)", renders every test case and copies the PNGs into `<folder>`; with `TMDB_KEY` set, also checks the live feed |
+| `dev/recipe_test.php` | The test cases (section, rotation, layout, device, language, missing poster, errors, missing key) run inside LaraPaper |
+| `dev/test_payload.json` | Frozen TMDB results for France (October 20, 2026), in French and English, used by the test cases |
+| `dev/update.php` | Copies the code of "MoviePoster (test)" into the installed plugin, keeping its settings |
+| `dev/install.php` | First install: imports the recipe as "MoviePoster" with the key from `TMDB_KEY` |
+
+The scripts target a LaraPaper server running in Docker (container `larapaper-app-1`) over SSH, set with `LARAPAPER_SSH` (e.g. `root@my-server`) in the environment or in `dev/.env` (ignored by git).
 
 ### Notes
 
@@ -91,7 +93,7 @@ The polling URL makes six TMDB requests, one per release week (Wednesday to Tues
 
 *Ce qui passe au cinéma, façon affiche.*
 
-Un plugin TRMNL qui met un film à l'affiche : les films les plus attendus, ceux qui sont en salle ou les prochaines sorties, avec son affiche, sa note TMDB ou un compte à rebours avant sa sortie. Il fait partie de la suite Poster avec [FlightPoster](http://192.168.1.109:3000/Anthony/FlightPoster), [WeatherPoster](http://192.168.1.109:3000/Anthony/WeatherPoster) et [GamePoster](http://192.168.1.109:3000/Anthony/GamePoster), dont il reprend le style.
+Un plugin TRMNL qui met un film à l'affiche : les films les plus attendus, ceux qui sont en salle ou les prochaines sorties, avec son affiche, sa note TMDB ou un compte à rebours avant sa sortie. Il fait partie de la suite Poster avec [FlightPoster](https://github.com/BartoX360/FlightPoster), [WeatherPoster](https://github.com/BartoX360/WeatherPoster), [GamePoster](https://github.com/BartoX360/GamePoster), [ShowPoster](https://github.com/BartoX360/ShowPoster) et [BookPoster](https://github.com/BartoX360/BookPoster)dont il reprend le style.
 
 Aucun serveur à installer : les données et les affiches viennent de [TMDB](https://www.themoviedb.org), avec votre propre clé d'API gratuite.
 
@@ -124,7 +126,7 @@ Il faut d'abord une clé d'API TMDB : créez un compte gratuit sur [themoviedb.o
 - les `custom_fields` de `recipe/src/settings.yml` dans *Custom fields* (YAML) ;
 - `recipe/src/shared.liquid` dans *Shared markup*, et chaque `recipe/src/<format>.liquid` dans l'onglet correspondant.
 
-**LaraPaper / BYOS** : *Plugins → Import recipe*, choisissez `recipe/movieposter.zip` (créé par `recipe_render.sh`, ou zippez le contenu de `recipe/src/`), puis remplissez les réglages.
+**LaraPaper / BYOS** : *Plugins → Import recipe*, choisissez `movieposter-x.y.z.zip` dans la [dernière release](https://github.com/BartoX360/MoviePoster/releases/latest) (ou zippez le contenu de `recipe/src/`), puis remplissez les réglages.
 
 ### Réglages
 
@@ -151,3 +153,9 @@ L'URL de polling fait six requêtes TMDB, une par semaine de sortie (du mercredi
 - Un titre sans lettres latines (absentes de la police des titres) est remplacé par le titre original, ou le film est écarté.
 - Un rafraîchissement toutes les 60 minutes suffit à faire tourner l'affiche ; les limites de TMDB sont bien au-delà de six requêtes par heure.
 - Ce produit utilise l'API TMDB mais n'est ni approuvé ni certifié par TMDB.
+
+---
+
+## Licence / License
+
+Code sous licence [MIT](LICENSE). Les données affichées appartiennent à leurs sources respectives. / Code released under the [MIT](LICENSE) license. The data shown belongs to its respective sources.

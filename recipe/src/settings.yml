@@ -19,7 +19,8 @@ custom_fields:
 - keyname: about
   field_type: author_bio
   name: MoviePoster
-  description: "What's out at the movies and what's coming next, drawn as a poster. Data and posters: TMDB. This product uses the TMDB API but is not endorsed or certified by TMDB. / Les films à l'affiche et les prochaines sorties au cinéma, façon affiche."
+  description: "What's out at the movies and what's coming next, drawn as a poster. Data and posters: TMDB. This product uses the TMDB API but is not endorsed or certified by TMDB. / Les films à l'affiche et les prochaines sorties au cinéma, façon affiche. v1.0.0"
+  github_url: https://github.com/BartoX360/MoviePoster
 - keyname: api_key
   field_type: string
   name: TMDB API key / Clé d'API TMDB
