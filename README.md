@@ -38,6 +38,9 @@ No server to install: the data and posters come from [TMDB](https://www.themovie
 
 ### Installation
 
+> [!NOTE]
+> This plugin is built and tested on [LaraPaper](https://github.com/usetrmnl/larapaper) only. It should work on usetrmnl.com and other TRMNL servers, but it has not been tested there: feedback is welcome in the issues.
+
 First get a TMDB API key: create a free account on [themoviedb.org](https://www.themoviedb.org/signup), then *Settings → API* and copy the **API key** (v3, 32 characters).
 
 **TRMNL (usetrmnl.com)**: create a *Private Plugin* with the *Polling* strategy, then copy:
@@ -118,6 +121,9 @@ Aucun serveur à installer : les données et les affiches viennent de [TMDB](htt
 | Quart d'écran | Demi vertical |
 
 ### Installation
+
+> [!NOTE]
+> Ce plugin est développé et testé uniquement sur [LaraPaper](https://github.com/usetrmnl/larapaper). Il devrait fonctionner sur usetrmnl.com et les autres serveurs TRMNL, mais il n'y a pas été testé : les retours sont les bienvenus dans les issues.
 
 Il faut d'abord une clé d'API TMDB : créez un compte gratuit sur [themoviedb.org](https://www.themoviedb.org/signup), puis *Paramètres → API* et copiez la **clé d'API** (v3, 32 caractères).
 
